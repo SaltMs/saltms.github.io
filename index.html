@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Murat Salt</title>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://saltms.github.io/">
+<meta property="og:title" content="Murat Salt · Business Systems, Data &amp; Software">
+<meta property="og:description" content="Final-year MIS student at Kadir Has University. SQL analysis, REST APIs, ERP and a Flutter game on iOS and Android.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314171A'/%3E%3Ctext x='5' y='23' font-family='Arial' font-weight='700' font-size='18' fill='%23ECEEE9'%3EM%3C/text%3E%3Crect x='23' y='9' width='3' height='14' fill='%238B9BFF'/%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="description" content="Murat Salt — Management Information Systems student working across business systems, data and software.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@500;700;800&display=swap">
+<style>
+/* Layout: a database client. Schema rail on the left lists the "tables"; one reading column holds them as result rows. A live query console in the hero navigates the site. */
+:root {
+  --bg: #ECEEE9;
+  --surface: #F6F7F3;
+  --ink: #14171A;
+  --muted: #5B635E;
+  --line: #D2D6CE;
+  --accent: #2D44CF;
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(45, 68, 207, .09);
+  --flash: rgba(45, 68, 207, .16);
+  --ok: #1E8A55;
+  --err: #C23A2B;
+
+  --f-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1011; --surface: #16191A; --ink: #E6E9E3; --muted: #8E9690; --line: #282D2C;
+    --accent: #8B9BFF; --accent-ink: #0E1011; --accent-soft: rgba(139, 155, 255, .10); --flash: rgba(139, 155, 255, .20);
+    --ok: #5BCB8E; --err: #FF7A69;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1011; --surface: #16191A; --ink: #E6E9E3; --muted: #8E9690; --line: #282D2C;
+  --accent: #8B9BFF; --accent-ink: #0E1011; --accent-soft: rgba(139, 155, 255, .10); --flash: rgba(139, 155, 255, .20);
+  --ok: #5BCB8E; --err: #FF7A69;
+  color-scheme: dark;
+}
+
+/* language: English unless <html lang="tr"> */
+:root[lang="tr"] [data-l="en"], :root:not([lang="tr"]) [data-l="tr"] { display: none !important; }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg);
+}
+a { color: inherit; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- layout ---------- */
+.layout {
+  max-width: 1160px; margin: 0 auto;
+  display: grid; grid-template-columns: 228px minmax(0, 1fr); gap: 56px;
+}
+.rail, main { padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+main { padding-block: 72px 0; min-width: 0; }
+
+/* ---------- schema rail ---------- */
+.rail-inner {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px);
+  display: flex; flex-direction: column; gap: 20px;
+  font-family: var(--f-mono); font-size: 13px;
+}
+.db { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 500; }
+.db .ext { color: var(--muted); }
+.dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent);
+}
+.rail-label { margin: 0; color: var(--muted); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.rail ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.rail li a {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 6px 10px; margin-inline: -10px; border-radius: 6px;
+  text-decoration: none; color: var(--muted);
+  transition: color .15s, background-color .15s;
+}
+.rail li a::before { content: "▸"; font-size: 10px; margin-right: -4px; opacity: .45; transition: transform .2s; }
+.rail li a .t { flex: 1; }
+.rail li a .n { font-size: 11px; opacity: .7; font-variant-numeric: tabular-nums; }
+.rail li a:hover { color: var(--ink); background: var(--accent-soft); }
+.rail li a.on { color: var(--accent); background: var(--accent-soft); }
+.rail li a.on::before { transform: rotate(90deg); opacity: 1; }
+.rail-hint { margin: 0; color: var(--muted); font-size: 12px; }
+kbd {
+  font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radius: 4px;
+  border: 1px solid var(--line); border-bottom-width: 2px; background: var(--surface); color: var(--ink);
+}
+.lang-switch {
+  display: inline-flex; align-self: flex-start; padding: 3px; gap: 2px; flex: none;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+}
+.lang-switch button {
+  font: inherit; font-size: 11px; letter-spacing: .06em; cursor: pointer;
+  border: 0; border-radius: 999px; padding: 4px 10px; background: transparent; color: var(--muted);
+  transition: background-color .15s, color .15s;
+}
+.lang-switch button:hover { color: var(--ink); }
+.lang-switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* ---------- hero ---------- */
+.hero { display: flex; flex-direction: column; gap: 28px; padding-bottom: 96px; }
+.eyebrow { margin: 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.name {
+  margin: 0; font-family: var(--f-display); font-weight: 800;
+  font-size: clamp(64px, 12.5vw, 148px); line-height: .86; letter-spacing: -.045em;
+}
+.name .cursor {
+  display: inline-block; width: .09em; height: .78em; margin-left: .06em;
+  background: var(--accent); vertical-align: baseline; transform: translateY(.04em);
+  animation: blink 1.1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.lede { margin: 0; max-width: 58ch; font-size: clamp(17px, 1.6vw, 19px); line-height: 1.55; }
+.lede em { font-style: normal; color: var(--accent); }
+
+/* ---------- console ---------- */
+.console {
+  margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+  font-family: var(--f-mono); font-size: 13px; overflow: hidden;
+}
+.console-bar {
+  display: flex; justify-content: space-between; gap: 12px; padding: 9px 14px;
+  border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.console-bar .lights { display: inline-flex; gap: 6px; align-items: center; }
+.console-bar .lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); display: block; }
+.prompt { display: flex; align-items: center; gap: 10px; padding: 14px 14px 10px; }
+.ps { color: var(--accent); white-space: nowrap; user-select: none; }
+#q {
+  flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink);
+  font: inherit; font-size: 14px; caret-color: var(--accent); padding: 2px 0;
+}
+#q::placeholder { color: var(--muted); opacity: .7; }
+.prompt:focus-within { box-shadow: inset 0 -1px 0 var(--accent); }
+.out { padding: 6px 14px 14px; min-height: 120px; }
+.echo { margin: 0 0 10px; color: var(--muted); word-break: break-word; }
+.echo b { color: var(--ink); font-weight: 400; }
+.res-wrap { overflow-x: auto; }
+table.res { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.res th {
+  text-align: left; font-weight: 500; color: var(--muted); padding: 4px 18px 6px 0;
+  border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+table.res td { padding: 6px 18px 6px 0; border-bottom: 1px dashed var(--line); white-space: nowrap; vertical-align: top; }
+table.res tr:last-child td { border-bottom: 0; }
+table.res tr[data-jump] { cursor: pointer; }
+table.res tr[data-jump]:hover td, table.res tr[data-jump]:focus-visible td { color: var(--accent); }
+table.res tr[data-jump] td:last-child::after { content: "  ↗"; color: var(--accent); opacity: 0; transition: opacity .15s; }
+table.res tr[data-jump]:hover td:last-child::after, table.res tr[data-jump]:focus-visible td:last-child::after { opacity: 1; }
+table.res tr:focus-visible { outline: none; }
+.meta { margin: 10px 0 0; color: var(--muted); }
+.meta .ok { color: var(--ok); }
+.err { color: var(--err); margin: 0; }
+.hint { color: var(--muted); margin: 6px 0 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px 14px; border-top: 1px solid var(--line); }
+.chips .lbl { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; align-self: center; margin-right: 4px; }
+.chip-q {
+  font: inherit; font-size: 12px; color: var(--ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px;
+  transition: border-color .15s, color .15s, background-color .15s;
+}
+.chip-q:hover { border-color: var(--accent); color: var(--accent); }
+.chip-q:active { background: var(--accent-soft); }
+
+/* ---------- sections ---------- */
+section { padding-block: 0 104px; }
+.th {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 8px;
+  font-family: var(--f-display); font-weight: 700; font-size: clamp(32px, 4.4vw, 46px);
+  letter-spacing: -.03em; line-height: 1.05;
+}
+.th .kw { font-family: var(--f-mono); font-weight: 400; font-size: 12px; letter-spacing: .1em; color: var(--accent); text-transform: uppercase; transform: translateY(-.6em); }
+.th .count { font-family: var(--f-mono); font-weight: 400; font-size: 13px; letter-spacing: 0; color: var(--muted); }
+.sub { margin: 0 0 8px; max-width: 60ch; color: var(--muted); }
+.cols {
+  display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 24px;
+  font-family: var(--f-mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+  padding: 18px 0 10px; border-bottom: 1px solid var(--ink);
+}
+.cols.proj { grid-template-columns: 148px minmax(0, 1fr) 150px; }
+.cols.proj > :last-child { text-align: right; }
+.cols.gap { margin-top: 40px; }
+.row {
+  position: relative; isolation: isolate; display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 24px;
+  padding: 28px 0; border-bottom: 1px solid var(--line);
+}
+.row::before {
+  content: ""; position: absolute; inset: 0 -16px; border-radius: 8px; z-index: -1;
+  background: transparent; transition: background-color .25s;
+}
+.row:hover::before { background: var(--accent-soft); }
+.row.flash::before { animation: flash 1.6s ease-out; }
+@keyframes flash { 0%, 30% { background: var(--flash); } 100% { background: transparent; } }
+.row.match .when::after { content: "● joined"; display: block; margin-top: 6px; color: var(--accent); }
+:root[lang="tr"] .row.match .when::after { content: "● eşleşti"; }
+.when { font-family: var(--f-mono); font-size: 13px; color: var(--muted); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.when .loc { display: block; opacity: .8; }
+.what { min-width: 0; }
+.what h3 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 22px; letter-spacing: -.015em; line-height: 1.25; text-wrap: balance; }
+.org { margin: 2px 0 0; color: var(--muted); }
+.org a { text-decoration-color: var(--line); text-underline-offset: 3px; }
+.org a:hover { color: var(--accent); text-decoration-color: currentColor; }
+.what ul { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; max-width: 64ch; }
+.what li { position: relative; padding-left: 20px; }
+.what li::before { content: "—"; position: absolute; left: 0; color: var(--muted); }
+.what ul.tags { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+.tags li { font-family: var(--f-mono); font-size: 11px; color: var(--muted); padding: 2px 8px; border: 1px solid var(--line); border-radius: 4px; }
+.tags li::before { content: none; }
+
+.row.proj { grid-template-columns: 148px minmax(0, 1fr) 150px; }
+.stat { text-align: right; display: flex; flex-direction: column; gap: 4px; }
+.stat b { font-family: var(--f-display); font-weight: 800; font-size: 40px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { font-family: var(--f-mono); font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ---------- skills ---------- */
+.sg { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.sg h3 { margin: 0; font-family: var(--f-mono); font-weight: 400; font-size: 13px; color: var(--muted); }
+.sg .list { display: flex; flex-wrap: wrap; gap: 8px; }
+.skill {
+  font-family: var(--f-body); font-size: 15px; padding: 6px 12px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  display: inline-flex; align-items: center; gap: 8px; line-height: 1.3;
+}
+button.skill { cursor: pointer; transition: border-color .15s, background-color .15s, color .15s; }
+button.skill sup { font-family: var(--f-mono); font-size: 10px; color: var(--accent); top: 0; }
+button.skill:hover { border-color: var(--accent); }
+button.skill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button.skill[aria-pressed="true"] sup { color: var(--accent-ink); }
+.join {
+  margin-top: 20px; padding: 14px 16px; border-radius: 8px; border: 1px dashed var(--line);
+  font-family: var(--f-mono); font-size: 13px; color: var(--muted); min-height: 52px;
+}
+.join b { color: var(--ink); font-weight: 500; }
+.join .hit {
+  display: inline-block; margin: 6px 12px 0 0; color: var(--accent); text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+.join .hit:hover { border-bottom-width: 2px; }
+
+/* ---------- languages ---------- */
+.lang { display: grid; grid-template-columns: 148px minmax(0, 1fr) 80px; gap: 24px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.lang h3 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 20px; letter-spacing: -.01em; }
+.cefr { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.cefr i {
+  font-style: normal; font-family: var(--f-mono); font-size: 10px; text-align: center;
+  padding: 5px 0 4px; border-radius: 3px; color: var(--muted); border: 1px solid var(--line);
+}
+.cefr i.f { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.cefr i.f.top { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.lang .lvl { font-family: var(--f-mono); font-size: 13px; text-align: right; }
+
+/* ---------- contact ---------- */
+.contact { padding-bottom: 72px; }
+.contact p.intro { max-width: 52ch; margin: 18px 0 32px; font-size: 18px; }
+.mail-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.mail {
+  font-family: var(--f-display); font-weight: 700; letter-spacing: -.025em;
+  font-size: clamp(22px, 4.6vw, 44px); line-height: 1.1; word-break: break-all;
+  text-decoration: none; background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 3px; background-position: 0 100%; background-repeat: no-repeat;
+  transition: background-size .35s ease;
+}
+.mail:hover { background-size: 100% 3px; }
+.btn {
+  font-family: var(--f-mono); font-size: 12px; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid var(--ink);
+  background: var(--ink); color: var(--bg); transition: background-color .15s, color .15s;
+}
+.btn:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.links a {
+  display: inline-flex; flex-direction: column; gap: 2px;
+  font-family: var(--f-mono); font-size: 13px; text-decoration: none;
+  padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line); min-width: 0;
+  transition: border-color .15s, color .15s;
+}
+.links a small { color: var(--muted); font-size: 11px; word-break: break-all; }
+.links a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- status bar ---------- */
+.status {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px;
+  border-top: 1px solid var(--line); padding-block: 18px 28px;
+  font-family: var(--f-mono); font-size: 12px; color: var(--muted);
+}
+.status .l { display: inline-flex; align-items: center; gap: 10px; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 960px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .rail {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .rail-inner { position: static; flex-direction: row; align-items: center; gap: 14px; padding-block: 10px; }
+  .rail-label, .rail-hint { display: none; }
+  .rail nav { flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .rail nav::-webkit-scrollbar { display: none; }
+  .rail ul { flex-direction: row; gap: 4px; }
+  .rail li a { margin: 0; padding: 5px 10px; white-space: nowrap; }
+  .rail li a::before, .rail li a .n { display: none; }
+  .lang-switch { align-self: center; }
+  .db { white-space: nowrap; }
+  main { padding-block: 48px 0; }
+  html { scroll-padding-top: 72px; }
+}
+@media (max-width: 640px) {
+  .cols { display: none; }
+  .row, .row.proj, .sg { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .row.proj .stat { text-align: left; flex-direction: row; align-items: baseline; gap: 10px; margin-top: 6px; }
+  .row.proj .stat b { font-size: 30px; }
+  .row::before { inset: 0 -10px; }
+  .lang { grid-template-columns: 1fr auto; gap: 10px 16px; }
+  .lang .cefr { grid-column: 1 / -1; grid-row: 2; }
+  .hero { padding-bottom: 72px; }
+  section { padding-bottom: 80px; }
+  .db .ext { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="rail" aria-label="Sections">
+    <div class="rail-inner">
+      <a class="db" href="#top"><span class="dot" aria-hidden="true"></span>murat_salt<span class="ext">.db</span></a>
+      <p class="rail-label"><span data-l="en">Tables</span><span data-l="tr">Tablolar</span></p>
+      <nav>
+        <ul>
+          <li><a href="#experience" data-spy="experience"><span class="t"><span data-l="en">experience</span><span data-l="tr">deneyim</span></span><span class="n">3</span></a></li>
+          <li><a href="#projects" data-spy="projects"><span class="t"><span data-l="en">projects</span><span data-l="tr">projeler</span></span><span class="n">3</span></a></li>
+          <li><a href="#education" data-spy="education"><span class="t"><span data-l="en">education</span><span data-l="tr">egitim</span></span><span class="n">2</span></a></li>
+          <li><a href="#skills" data-spy="skills"><span class="t"><span data-l="en">skills</span><span data-l="tr">yetenekler</span></span><span class="n">21</span></a></li>
+          <li><a href="#credentials" data-spy="credentials"><span class="t"><span data-l="en">credentials</span><span data-l="tr">belgeler</span></span><span class="n">7</span></a></li>
+          <li><a href="#contact" data-spy="contact"><span class="t"><span data-l="en">contact</span><span data-l="tr">iletisim</span></span><span class="n">3</span></a></li>
+        </ul>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / Dil">
+        <button type="button" data-set="en" aria-pressed="true">EN</button>
+        <button type="button" data-set="tr" aria-pressed="false">TR</button>
+      </div>
+      <p class="rail-hint"><kbd>/</kbd> <span data-l="en">to write a query</span><span data-l="tr">ile sorgu yaz</span></p>
+    </div>
+  </aside>
+
+  <main id="top">
+    <header class="hero">
+      <p class="eyebrow"><span data-l="en">-- Istanbul, Türkiye · Management Information Systems</span><span data-l="tr">-- İstanbul, Türkiye · Yönetim Bilişim Sistemleri</span></p>
+      <h1 class="name">Murat<br>Salt<span class="cursor" aria-hidden="true"></span></h1>
+      <p class="lede" data-l="en">I work between business processes and the software that runs them: <em>SQL analysis</em>, <em>REST API testing</em>, accounting operations, and a Flutter game published on iOS and Android. Final-year MIS student at Kadir Has University, interested in ERP and business systems.</p>
+      <p class="lede" data-l="tr">İş süreçleri ile onları çalıştıran yazılımın kesiştiği yerde çalışıyorum: <em>SQL analizi</em>, <em>REST API testleri</em>, muhasebe operasyonları ve iOS ile Android'de yayında olan bir Flutter oyunu. Kadir Has Üniversitesi Yönetim Bilişim Sistemleri son sınıf öğrencisiyim; ERP ve iş sistemleriyle ilgileniyorum.</p>
+
+      <div class="console" role="region" aria-label="Query console">
+        <div class="console-bar">
+          <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>murat_salt.db · <span data-l="en">read-only</span><span data-l="tr">salt okunur</span></span>
+        </div>
+        <form class="prompt" id="qform" autocomplete="off">
+          <label for="q" class="ps">msalt=#</label>
+          <input id="q" name="q" type="text" spellcheck="false" autocapitalize="off">
+        </form>
+        <div class="out" id="out" aria-live="polite"></div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </header>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" aria-labelledby="h-exp">
+      <h2 class="th" id="h-exp"><span class="kw"><span data-l="en">table</span><span data-l="tr">tablo</span></span><span data-l="en">Experience</span><span data-l="tr">Deneyim</span><span class="count">3 <span data-l="en">rows</span><span data-l="tr">satır</span></span></h2>
+      <div class="cols" aria-hidden="true"><span><span data-l="en">period</span><span data-l="tr">dönem</span></span><span><span data-l="en">role · company</span><span data-l="tr">rol · şirket</span></span></div>
+
+      <article class="row" id="exp-bilsoft" data-skills="REST APIs">
+        <div class="when"><span data-l="en">Jun – Jul 2026</span><span data-l="tr">Haz – Tem 2026</span><span class="loc"><span data-l="en">Remote</span><span data-l="tr">Uzaktan</span></span></div>
+        <div class="what">
+          <h3><span data-l="en">Software Development Intern</span><span data-l="tr">Yazılım Geliştirme Stajyeri</span></h3>
+          <p class="org">Bilsoft Software</p>
+          <ul data-l="en">
+            <li>Tested REST API endpoints in Postman, including GET and POST requests.</li>
+            <li>Worked with personnel, payroll, invoice and OCR-related business data.</li>
+            <li>Checked API responses, debugged issues and wrote technical documentation.</li>
+          </ul>
+          <ul data-l="tr">
+            <li>Postman ile GET ve POST istekleri dahil REST API uç noktalarını test ettim.</li>
+            <li>Personel, bordro, fatura ve OCR ile ilgili iş verileriyle çalıştım.</li>
+            <li>API yanıtlarını kontrol ettim, hataları ayıkladım ve teknik dokümantasyon hazırladım.</li>
+          </ul>
+          <ul class="tags"><li>REST APIs</li><li>Postman</li><li><span data-l="en">OCR data</span><span data-l="tr">OCR verisi</span></li></ul>
+        </div>
+      </article>
+
+      <article class="row" id="exp-donella" data-skills="">
+        <div class="when"><span data-l="en">Jul – Aug 2025</span><span data-l="tr">Tem – Ağu 2025</span><span class="loc"><span data-l="en">Istanbul</span><span data-l="tr">İstanbul</span></span></div>
+        <div class="what">
+          <h3><span data-l="en">Accounting Intern</span><span data-l="tr">Muhasebe Stajyeri</span></h3>
+          <p class="org">Donella</p>
+          <ul data-l="en">
+            <li>Supported invoice tracking, financial data entry and accounting record maintenance.</li>
+            <li>Organised invoices, receipts and financial documents for reporting and reconciliation.</li>
+          </ul>
+          <ul data-l="tr">
+            <li>Fatura takibi, finansal veri girişi ve muhasebe kayıtlarının tutulmasına destek oldum.</li>
+            <li>Raporlama ve mutabakat için fatura, makbuz ve finansal belgeleri düzenledim.</li>
+          </ul>
+          <ul class="tags"><li><span data-l="en">Invoicing</span><span data-l="tr">Faturalama</span></li><li><span data-l="en">Reconciliation</span><span data-l="tr">Mutabakat</span></li></ul>
+        </div>
+      </article>
+
+      <article class="row" id="exp-outlier" data-skills="">
+        <div class="when">2024 – 2025<span class="loc"><span data-l="en">Remote</span><span data-l="tr">Uzaktan</span></span></div>
+        <div class="what">
+          <h3><span data-l="en">AI Data Trainer · Audio Annotation</span><span data-l="tr">Yapay Zekâ Veri Eğitmeni · Ses Etiketleme</span></h3>
+          <p class="org">Outlier AI</p>
+          <ul data-l="en">
+            <li>Evaluated multilingual speech data for transcription accuracy, linguistic quality and consistency.</li>
+            <li>Applied annotation guidelines and gave structured quality feedback for AI training tasks.</li>
+          </ul>
+          <ul data-l="tr">
+            <li>Çok dilli konuşma verilerini transkripsiyon doğruluğu, dil kalitesi ve tutarlılık açısından değerlendirdim.</li>
+            <li>Etiketleme yönergelerini uyguladım, yapay zekâ eğitim görevleri için yapılandırılmış kalite geri bildirimi verdim.</li>
+          </ul>
+          <ul class="tags"><li><span data-l="en">Speech data</span><span data-l="tr">Konuşma verisi</span></li><li><span data-l="en">Quality review</span><span data-l="tr">Kalite kontrol</span></li></ul>
+        </div>
+      </article>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" aria-labelledby="h-proj">
+      <h2 class="th" id="h-proj"><span class="kw"><span data-l="en">table</span><span data-l="tr">tablo</span></span><span data-l="en">Projects</span><span data-l="tr">Projeler</span><span class="count">3 <span data-l="en">rows</span><span data-l="tr">satır</span></span></h2>
+      <div class="cols proj" aria-hidden="true"><span><span data-l="en">year</span><span data-l="tr">yıl</span></span><span><span data-l="en">name · stack</span><span data-l="tr">ad · teknoloji</span></span><span><span data-l="en">key figure</span><span data-l="tr">öne çıkan</span></span></div>
+
+      <article class="row proj" id="proj-restaurant" data-skills="SQL,MySQL,Data aggregation,Customer segmentation,GitHub">
+        <div class="when">2026</div>
+        <div class="what">
+          <h3><span data-l="en">Restaurant Order Analysis</span><span data-l="tr">Restoran Sipariş Analizi</span></h3>
+          <p class="org">MySQL · <a href="https://github.com/SaltMs/restaurant-sql-analysis" target="_blank" rel="noopener">GitHub ↗</a></p>
+          <ul data-l="en">
+            <li>Ran 12 SQL analyses on 5,000 orders covering restaurant performance, customer behaviour, order trends and cuisine performance.</li>
+            <li>Used joins, aggregation, subqueries, CASE statements, date functions and customer segmentation.</li>
+          </ul>
+          <ul data-l="tr">
+            <li>5.000 sipariş üzerinde restoran performansı, müşteri davranışı, sipariş eğilimleri ve mutfak performansını inceleyen 12 SQL analizi yaptım.</li>
+            <li>Join, aggregation, alt sorgu, CASE ifadeleri, tarih fonksiyonları ve müşteri segmentasyonu kullandım.</li>
+          </ul>
+        </div>
+        <div class="stat"><b data-l="en">5,000</b><b data-l="tr">5.000</b><span data-l="en">orders across 12 analyses</span><span data-l="tr">sipariş, 12 analiz</span></div>
+      </article>
+
+      <article class="row proj" id="proj-mazle" data-skills="Flutter,Dart,Firebase,Google Analytics,AdMob,KPI analysis">
+        <div class="when">2026</div>
+        <div class="what">
+          <h3>Mazle</h3>
+          <p class="org"><span data-l="en">Cross-platform mobile game · Flutter</span><span data-l="tr">Çapraz platform mobil oyun · Flutter</span></p>
+          <ul data-l="en">
+            <li>Built and published a Flutter game for iOS and Android.</li>
+            <li>Integrated Firebase, Google Analytics and AdMob to track activity, retention, engagement and ad performance.</li>
+          </ul>
+          <ul data-l="tr">
+            <li>iOS ve Android için bir Flutter oyunu geliştirip yayınladım.</li>
+            <li>Firebase, Google Analytics ve AdMob entegre ederek kullanıcı aktivitesi, elde tutma, etkileşim ve reklam performansını takip ettim.</li>
+          </ul>
+        </div>
+        <div class="stat"><b>2</b><span data-l="en">stores live: iOS &amp; Android</span><span data-l="tr">mağazada yayında: iOS ve Android</span></div>
+      </article>
+
+      <article class="row proj" id="proj-iis" data-skills="Agile/Scrum">
+        <div class="when">2026</div>
+        <div class="what">
+          <h3><span data-l="en">Integrated Information System</span><span data-l="tr">Entegre Bilgi Sistemi</span></h3>
+          <p class="org"><span data-l="en">R&amp;D Directorate · systems design</span><span data-l="tr">Ar-Ge Müdürlüğü · sistem tasarımı</span></p>
+          <ul data-l="en">
+            <li>Designed an Agile/Scrum system model, a work breakdown structure and a project schedule.</li>
+          </ul>
+          <ul data-l="tr">
+            <li>Agile/Scrum sistem modeli, iş kırılım yapısı (WBS) ve proje takvimi tasarladım.</li>
+          </ul>
+        </div>
+        <div class="stat"><b>3</b><span data-l="en">deliverables: model, WBS, schedule</span><span data-l="tr">çıktı: model, WBS, takvim</span></div>
+      </article>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education" aria-labelledby="h-edu">
+      <h2 class="th" id="h-edu"><span class="kw"><span data-l="en">table</span><span data-l="tr">tablo</span></span><span data-l="en">Education</span><span data-l="tr">Eğitim</span><span class="count">2 <span data-l="en">rows</span><span data-l="tr">satır</span></span></h2>
+      <div class="cols" aria-hidden="true"><span><span data-l="en">period</span><span data-l="tr">dönem</span></span><span><span data-l="en">school · program</span><span data-l="tr">okul · program</span></span></div>
+
+      <article class="row" id="edu-khas" data-skills="SQL">
+        <div class="when">2023 – 2027<span class="loc"><span data-l="en">Istanbul</span><span data-l="tr">İstanbul</span></span></div>
+        <div class="what">
+          <h3><span data-l="en">Kadir Has University</span><span data-l="tr">Kadir Has Üniversitesi</span></h3>
+          <p class="org"><span data-l="en">B.S. Management Information Systems (expected 2027)</span><span data-l="tr">Yönetim Bilişim Sistemleri lisans (mezuniyet 2027)</span></p>
+          <ul class="tags" data-l="en"><li>Database Management</li><li>SQL</li><li>Systems Analysis &amp; Design</li><li>Project Management</li><li>Programming Logic</li></ul>
+          <ul class="tags" data-l="tr"><li>Veritabanı Yönetimi</li><li>SQL</li><li>Sistem Analizi ve Tasarımı</li><li>Proje Yönetimi</li><li>Programlama Mantığı</li></ul>
+        </div>
+      </article>
+
+      <article class="row" id="edu-tm" data-skills="">
+        <div class="when"><span data-l="en">Spring 2025</span><span data-l="tr">Bahar 2025</span><span class="loc"><span data-l="en">Mechelen, Belgium</span><span data-l="tr">Mechelen, Belçika</span></span></div>
+        <div class="what">
+          <h3><span data-l="en">Thomas More University of Applied Sciences</span><span data-l="tr">Thomas More Uygulamalı Bilimler Üniversitesi</span></h3>
+          <p class="org"><span data-l="en">Erasmus+ exchange semester</span><span data-l="tr">Erasmus+ değişim dönemi</span></p>
+        </div>
+      </article>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" aria-labelledby="h-skills">
+      <h2 class="th" id="h-skills"><span class="kw"><span data-l="en">table</span><span data-l="tr">tablo</span></span><span data-l="en">Skills</span><span data-l="tr">Yetenekler</span><span class="count">21 <span data-l="en">rows</span><span data-l="tr">satır</span></span></h2>
+      <p class="sub"><span data-l="en">Select a skill to join it against the rest of the page and see where it was used.</span><span data-l="tr">Bir yeteneği seç; sayfanın geri kalanıyla birleştirip (JOIN) nerede kullanıldığını göstereyim.</span></p>
+      <div id="skill-groups"></div>
+      <div class="join" id="join" aria-live="polite"></div>
+    </section>
+
+    <!-- CREDENTIALS -->
+    <section id="credentials" aria-labelledby="h-cred">
+      <h2 class="th" id="h-cred"><span class="kw"><span data-l="en">table</span><span data-l="tr">tablo</span></span><span data-l="en">Certifications &amp; languages</span><span data-l="tr">Sertifikalar ve diller</span><span class="count">4 + 3 <span data-l="en">rows</span><span data-l="tr">satır</span></span></h2>
+      <div class="cols" aria-hidden="true"><span><span data-l="en">issuer</span><span data-l="tr">veren</span></span><span><span data-l="en">certificate</span><span data-l="tr">sertifika</span></span></div>
+      <article class="row" id="cert-gc" data-skills="">
+        <div class="when">Google Cloud</div>
+        <div class="what"><h3><span data-l="en">Introduction to Generative AI</span><span data-l="tr">Üretken Yapay Zekâya Giriş</span></h3><p class="org"><span data-l="en">Learning path</span><span data-l="tr">Öğrenme yolu</span></p></div>
+      </article>
+      <article class="row" id="cert-py1" data-skills="Python">
+        <div class="when">DataCamp</div>
+        <div class="what"><h3>Introduction to Python</h3></div>
+      </article>
+      <article class="row" id="cert-py2" data-skills="Python">
+        <div class="when">DataCamp</div>
+        <div class="what"><h3>Intermediate Python</h3></div>
+      </article>
+      <article class="row" id="cert-sql" data-skills="SQL">
+        <div class="when">DataCamp</div>
+        <div class="what"><h3>SQL Foundations</h3></div>
+      </article>
+
+      <div class="cols gap" aria-hidden="true"><span><span data-l="en">language</span><span data-l="tr">dil</span></span><span><span data-l="en">CEFR scale</span><span data-l="tr">CEFR ölçeği</span></span></div>
+      <div id="langs"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="contact" aria-labelledby="h-contact">
+      <h2 class="th" id="h-contact"><span class="kw">insert into</span><span data-l="en">Get in touch</span><span data-l="tr">İletişim</span></h2>
+      <p class="intro" data-l="en">I'm looking for internships and graduate roles in ERP, business systems, data analysis and software. Email is the fastest way to reach me.</p>
+      <p class="intro" data-l="tr">ERP, iş sistemleri, veri analizi ve yazılım alanlarında staj ve yeni mezun pozisyonlarına açığım. Bana en hızlı e-postayla ulaşabilirsin.</p>
+      <div class="mail-row">
+        <a class="mail" id="mail" href="mailto:batinmuratsalt@gmail.com">batinmuratsalt@gmail.com</a>
+        <button class="btn" type="button" id="copy"></button>
+      </div>
+      <div class="links">
+        <a href="https://www.linkedin.com/in/bat%C4%B1n-murat-salt-b721932a9" target="_blank" rel="noopener">LinkedIn ↗<small>in/batın-murat-salt</small></a>
+        <a href="https://github.com/SaltMs" target="_blank" rel="noopener">GitHub ↗<small>github.com/SaltMs</small></a>
+      </div>
+    </section>
+
+    <footer class="status">
+      <span class="l"><span class="dot" aria-hidden="true"></span><span id="conn"></span></span>
+      <span><span data-l="en">Updated November 2026</span><span data-l="tr">Kasım 2026'da güncellendi</span></span>
+    </footer>
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const root = document.documentElement;
+  let lang = "en";
+
+  /* ---------- strings ---------- */
+  const S = {
+    en: {
+      placeholder: "SELECT * FROM projects;  (try \\dt for tables)",
+      tryLbl: "Try", rows: n => `${n} row${n === 1 ? "" : "s"}`,
+      open: "open table ↓",
+      helpMeta: "Type a table name, or SELECT * FROM <table>; Rows link to the page.",
+      denied: "ERROR: permission denied. This database is read-only.", deniedHint: "HINT: try SELECT instead.",
+      missing: t => `ERROR: relation "${t}" does not exist`, missingHint: "HINT: run \\dt to list tables.",
+      joinIdle: "skills ⋈ work ON skill = <b>?</b> · pick a skill with a number next to it",
+      joinHead: (s, n) => `skills ⋈ work ON skill = <b>'${s}'</b> → ${n} row${n === 1 ? "" : "s"}`,
+      copy: "Copy address", copied: "Copied", selected: "Selected, press ⌘C",
+      conn: n => `connected · murat_salt.db · ${n} rows in 6 tables`,
+      groups: ["Data & business", "Development", "Tools & methods"],
+      langs: { Turkish: ["Turkish", "Native"], English: ["English", "C1"], French: ["French", "A2"] },
+    },
+    tr: {
+      placeholder: "SELECT * FROM projeler;  (tablolar için \\dt)",
+      tryLbl: "Dene", rows: n => `${n} satır`,
+      open: "tabloya git ↓",
+      helpMeta: "Bir tablo adı yaz ya da SELECT * FROM <tablo>; Satırlar sayfadaki bölüme götürür.",
+      denied: "HATA: izin reddedildi. Bu veritabanı salt okunur.", deniedHint: "İPUCU: bunun yerine SELECT dene.",
+      missing: t => `HATA: "${t}" adlı tablo yok`, missingHint: "İPUCU: tabloları görmek için \\dt yaz.",
+      joinIdle: "yetenekler ⋈ isler ON yetenek = <b>?</b> · yanında sayı olan bir yeteneği seç",
+      joinHead: (s, n) => `yetenekler ⋈ isler ON yetenek = <b>'${s}'</b> → ${n} satır`,
+      copy: "Adresi kopyala", copied: "Kopyalandı", selected: "Seçildi, ⌘C'ye bas",
+      conn: n => `bağlı · murat_salt.db · 6 tabloda ${n} satır`,
+      groups: ["Veri ve iş", "Geliştirme", "Araçlar ve yöntemler"],
+      langs: { Turkish: ["Türkçe", "Ana dil"], English: ["İngilizce", "C1"], French: ["Fransızca", "A2"] },
+    },
+  };
+
+  /* skill key (used for matching) -> Turkish label where it differs */
+  const SKILL_TR = { "Data aggregation": "Veri toplulaştırma", "Customer segmentation": "Müşteri segmentasyonu", "KPI analysis": "KPI analizi" };
+  const SKILLS = [
+    ["SQL", "MySQL", "Microsoft Excel", "Data aggregation", "Customer segmentation", "KPI analysis"],
+    ["Flutter", "Dart", "C#", "Python", "Unity", "REST APIs", "Riverpod", "Dio"],
+    ["Firebase", "Google Analytics", "AdMob", "Git", "GitHub", "MySQL Workbench", "Agile/Scrum"],
+  ];
+  const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const LANGS = [["Turkish", 6], ["English", 5], ["French", 2]];
+  const skillLabel = k => (lang === "tr" && SKILL_TR[k]) || k;
+
+  const items = $$("article.row[data-skills]");
+  const usedIn = s => items.filter(el => el.dataset.skills.split(",").includes(s));
+  const txt = el => { const v = el.querySelector(`[data-l="${lang}"]`); return (v || el).textContent.trim(); };
+  const titleOf = el => txt($("h3", el));
+
+  /* ---------- skills ---------- */
+  const groups = $("#skill-groups"), join = $("#join");
+  let activeSkill = null;
+  function renderSkills() {
+    groups.innerHTML = "";
+    SKILLS.forEach((list, gi) => {
+      const g = document.createElement("div");
+      g.className = "sg";
+      g.innerHTML = `<h3>${S[lang].groups[gi]}</h3><div class="list"></div>`;
+      const box = $(".list", g);
+      list.forEach(s => {
+        const n = usedIn(s).length;
+        const el = document.createElement(n ? "button" : "span");
+        el.className = "skill";
+        el.textContent = skillLabel(s);
+        if (n) {
+          el.type = "button";
+          el.dataset.skill = s;
+          el.setAttribute("aria-pressed", String(s === activeSkill));
+          const sup = document.createElement("sup"); sup.textContent = n; el.append(sup);
+        }
+        box.append(el);
+      });
+      groups.append(g);
+    });
+    renderJoin();
+  }
+  function renderJoin() {
+    items.forEach(el => el.classList.remove("match"));
+    if (!activeSkill) { join.innerHTML = S[lang].joinIdle; return; }
+    const hits = usedIn(activeSkill);
+    hits.forEach(el => el.classList.add("match"));
+    join.innerHTML = S[lang].joinHead(skillLabel(activeSkill), hits.length) + "<br>" +
+      hits.map(el => `<a class="hit" href="#${el.id}" data-jump="${el.id}">${titleOf(el)}</a>`).join("");
+  }
+  groups.addEventListener("click", e => {
+    const btn = e.target.closest("button.skill");
+    if (!btn) return;
+    activeSkill = activeSkill === btn.dataset.skill ? null : btn.dataset.skill;
+    $$("button.skill", groups).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.skill === activeSkill)));
+    renderJoin();
+  });
+
+  /* ---------- languages ---------- */
+  function renderLangs() {
+    $("#langs").innerHTML = LANGS.map(([key, lv]) => {
+      const [name, label] = S[lang].langs[key];
+      return `<div class="lang" id="lang-${key.toLowerCase()}">
+        <h3>${name}</h3>
+        <div class="cefr" role="img" aria-label="${name}: ${label}">
+          ${LEVELS.map((L, i) => `<i class="${i < lv ? "f" : ""}${i === lv - 1 ? " top" : ""}">${L}</i>`).join("")}
+        </div>
+        <span class="lvl">${label}</span>
+      </div>`;
+    }).join("");
+  }
+
+  /* ---------- jump + flash ---------- */
+  function jump(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: el.tagName === "SECTION" ? "start" : "center" });
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  }
+  document.addEventListener("click", e => {
+    const a = e.target.closest("[data-jump]");
+    if (a) { e.preventDefault(); jump(a.dataset.jump); }
+  });
+
+  /* ---------- console data ---------- */
+  const NAMES = {
+    en: { experience: "experience", projects: "projects", education: "education", skills: "skills", certifications: "certifications", languages: "languages", contact: "contact", whoami: "whoami" },
+    tr: { experience: "deneyim", projects: "projeler", education: "egitim", skills: "yetenekler", certifications: "sertifikalar", languages: "diller", contact: "iletisim", whoami: "benkimim" },
+  };
+  const ALIAS = { work: "experience", jobs: "experience", exp: "experience", project: "projects",
+    school: "education", edu: "education", skill: "skills", stack: "skills", certs: "certifications",
+    cert: "certifications", credentials: "certifications", lang: "languages", language: "languages",
+    email: "contact", me: "whoami", about: "whoami",
+    is: "experience", isler: "experience", "işler": "experience", proje: "projects", "eğitim": "education", okul: "education",
+    yetenek: "skills", sertifika: "certifications", belgeler: "certifications", dil: "languages",
+    "iletişim": "contact", hakkimda: "whoami", "hakkımda": "whoami" };
+  Object.values(NAMES).forEach(m => Object.entries(m).forEach(([k, v]) => { ALIAS[v] = k; }));
+
+  function tables() {
+    const tr = lang === "tr";
+    const L = (en, t) => tr ? t : en;
+    return {
+      experience: { cols: L(["role", "company", "period"], ["rol", "şirket", "dönem"]), target: "experience", rows: [
+        [L("Software Development Intern", "Yazılım Geliştirme Stajyeri"), "Bilsoft Software", "2026", "exp-bilsoft"],
+        [L("Accounting Intern", "Muhasebe Stajyeri"), "Donella", "2025", "exp-donella"],
+        [L("AI Data Trainer", "Yapay Zekâ Veri Eğitmeni"), "Outlier AI", "2024–25", "exp-outlier"] ] },
+      projects: { cols: L(["name", "stack", "year"], ["ad", "teknoloji", "yıl"]), target: "projects", rows: [
+        [L("Restaurant Order Analysis", "Restoran Sipariş Analizi"), "MySQL", "2026", "proj-restaurant"],
+        ["Mazle", "Flutter · Firebase", "2026", "proj-mazle"],
+        [L("Integrated Information System", "Entegre Bilgi Sistemi"), "Agile/Scrum", "2026", "proj-iis"] ] },
+      education: { cols: L(["school", "program", "period"], ["okul", "program", "dönem"]), target: "education", rows: [
+        [L("Kadir Has University", "Kadir Has Üniversitesi"), L("B.S. MIS", "YBS lisans"), "2023–27", "edu-khas"],
+        ["Thomas More", "Erasmus+", L("Spring 2025", "Bahar 2025"), "edu-tm"] ] },
+      skills: { cols: L(["category", "count"], ["kategori", "adet"]), target: "skills", rows:
+        SKILLS.map((l, i) => [S[lang].groups[i].toLowerCase(), String(l.length), "skills"]) },
+      certifications: { cols: L(["issuer", "title"], ["veren", "başlık"]), target: "credentials", rows: [
+        ["Google Cloud", L("Intro to Generative AI", "Üretken Yapay Zekâya Giriş"), "cert-gc"],
+        ["DataCamp", "Introduction to Python", "cert-py1"],
+        ["DataCamp", "Intermediate Python", "cert-py2"],
+        ["DataCamp", "SQL Foundations", "cert-sql"] ] },
+      languages: { cols: L(["language", "level"], ["dil", "seviye"]), target: "credentials", rows:
+        LANGS.map(([k]) => [...S[lang].langs[k], "lang-" + k.toLowerCase()]) },
+      contact: { cols: L(["channel", "value"], ["kanal", "değer"]), target: "contact", rows: [
+        [L("email", "e-posta"), "batinmuratsalt@gmail.com", "contact"],
+        ["linkedin", "in/batın-murat-salt", "contact"],
+        ["github", "github.com/SaltMs", "contact"] ] },
+      whoami: { cols: L(["field", "value"], ["alan", "değer"]), rows: [
+        [L("name", "ad"), "Murat Salt"],
+        [L("studies", "okul"), L("MIS, Kadir Has University", "YBS, Kadir Has Üniversitesi")],
+        [L("based", "konum"), L("Istanbul, Türkiye", "İstanbul, Türkiye")],
+        [L("into", "ilgi"), L("ERP, business systems, data, software", "ERP, iş sistemleri, veri, yazılım")],
+        [L("status", "durum"), L("open to work", "çalışmaya açık")] ] },
+    };
+  }
+
+  const out = $("#out"), input = $("#q"), form = $("#qform");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const ms = () => (0.6 + Math.random() * 2.4).toFixed(1);
+
+  function table(cols, rows) {
+    return `<div class="res-wrap"><table class="res"><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
+      rows.map(r => {
+        const tgt = r[cols.length];
+        return `<tr${tgt ? ` data-jump="${tgt}" tabindex="0"` : ""}>${r.slice(0, cols.length).map(c => `<td>${esc(c)}</td>`).join("")}</tr>`;
+      }).join("") + `</tbody></table></div>`;
+  }
+
+  let lastQuery = null;
+  function run(raw) {
+    const q = raw.trim();
+    if (!q) return;
+    const lc = q.toLowerCase().replace(/i̇/g, "i");
+    const T = tables(), s = S[lang];
+    let html = `<p class="echo">msalt=# <b>${esc(q)}</b></p>`;
+
+    if (/^(\\dt|\\d|\\\?|help|yardim|yardım|show tables;?)$/.test(lc)) {
+      const keys = Object.keys(NAMES.en);
+      html += table(lang === "tr" ? ["tablo", "satır"] : ["table", "rows"],
+        keys.map(k => [NAMES[lang][k], String(T[k].rows.length), T[k].target]));
+      html += `<p class="meta">${esc(s.helpMeta)}</p>`;
+    } else if (/\b(drop|delete|update|insert|truncate|alter|grant)\b/.test(lc)) {
+      html += `<p class="err">${s.denied}</p><p class="hint">${s.deniedHint}</p>`;
+    } else if (lc === "clear" || lc === "temizle") {
+      out.innerHTML = ""; lastQuery = null; return;
+    } else {
+      const m = lc.match(/\bfrom\s+([\p{L}_]+)/u) || lc.match(/^([\p{L}_]+)/u);
+      const word = m ? m[1] : "";
+      const key = ALIAS[word] || (T[word] ? word : null);
+      const t = key && T[key];
+      if (!t) {
+        html += `<p class="err">${esc(s.missing(word || q))}</p><p class="hint">${s.missingHint}</p>`;
+      } else {
+        html += table(t.cols, t.rows);
+        html += `<p class="meta"><span class="ok">(${s.rows(t.rows.length)})</span> · ${ms()} ms` +
+          (t.target ? ` · <a href="#${t.target}" data-jump="${t.target}">${s.open}</a>` : "") + `</p>`;
+      }
+    }
+    lastQuery = q;
+    out.innerHTML = html;
+  }
+
+  out.addEventListener("keydown", e => {
+    const tr = e.target.closest("tr[data-jump]");
+    if (tr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); jump(tr.dataset.jump); }
+  });
+  form.addEventListener("submit", e => { e.preventDefault(); run(input.value); input.value = ""; });
+
+  /* chips: SQL uses the table names of the current language */
+  const CHIPS = [
+    ["projects", n => `SELECT * FROM ${n.projects};`],
+    ["experience", n => `SELECT * FROM ${n.experience};`],
+    ["skills", n => `SELECT * FROM ${n.skills};`],
+    ["languages", n => `SELECT * FROM ${n.languages};`],
+    ["whoami", n => `SELECT * FROM ${n.whoami};`],
+  ];
+  const chips = $("#chips");
+  function renderChips() {
+    const n = NAMES[lang];
+    chips.innerHTML = `<span class="lbl">${S[lang].tryLbl}</span>` +
+      CHIPS.map(([k, f]) => `<button class="chip-q" type="button" data-q="${f(n)}">${n[k]}</button>`).join("") +
+      `<button class="chip-q" type="button" data-q="\\dt">\\dt</button>`;
+  }
+  let typing = null;
+  chips.addEventListener("click", e => {
+    const b = e.target.closest("[data-q]");
+    if (!b) return;
+    const text = b.dataset.q;
+    clearInterval(typing);
+    if (reduce) { run(text); return; }
+    let i = 0; input.value = "";
+    typing = setInterval(() => {
+      input.value = text.slice(0, ++i);
+      if (i >= text.length) {
+        clearInterval(typing);
+        setTimeout(() => { run(text); input.value = ""; }, 160);
+      }
+    }, 22);
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "/" && !/input|textarea/i.test(document.activeElement.tagName)) {
+      e.preventDefault(); input.focus();
+    }
+  });
+
+  /* ---------- copy email ---------- */
+  const copyBtn = $("#copy");
+  copyBtn.addEventListener("click", () => {
+    const addr = $("#mail").textContent;
+    const reset = d => setTimeout(() => copyBtn.textContent = S[lang].copy, d);
+    const done = () => { copyBtn.textContent = S[lang].copied; reset(1600); };
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents($("#mail"));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      copyBtn.textContent = S[lang].selected; reset(2200);
+    };
+    try { navigator.clipboard.writeText(addr).then(done, fallback); } catch { fallback(); }
+  });
+
+  /* ---------- language switch ---------- */
+  const skillCount = SKILLS.reduce((n, l) => n + l.length, 0);
+  const rowTotal = items.length + skillCount + LANGS.length + 3;
+  function setLang(next, remember) {
+    lang = next === "tr" ? "tr" : "en";
+    root.lang = lang;
+    $$(".lang-switch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.set === lang)));
+    input.placeholder = S[lang].placeholder;
+    copyBtn.textContent = S[lang].copy;
+    $("#conn").textContent = S[lang].conn(rowTotal);
+    renderChips(); renderSkills(); renderLangs();
+    const n = NAMES[lang];
+    if (lastQuery === null || /^select \* from \S+;$/i.test(lastQuery)) {
+      const cur = lastQuery && (lastQuery.match(/from\s+(\S+);/i) || [])[1];
+      const key = (cur && ALIAS[cur.toLowerCase()]) || "experience";
+      run(`SELECT * FROM ${n[key]};`);
+    } else run(lastQuery);
+    if (remember) { try { localStorage.setItem("lang", lang); } catch {} }
+  }
+  $$(".lang-switch button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.set, true)));
+
+  let initial = null;
+  try { initial = localStorage.getItem("lang"); } catch {}
+  if (!initial) initial = (navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en";
+  setLang(initial, false);
+
+  /* ---------- scroll spy ---------- */
+  const spy = $$("[data-spy]");
+  const nav = $(".rail nav");
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      spy.forEach(a => a.classList.toggle("on", a.dataset.spy === en.target.id));
+      const on = spy.find(a => a.classList.contains("on"));
+      if (on && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = on.offsetLeft - nav.clientWidth / 2 + on.offsetWidth / 2;
+    });
+  }, { rootMargin: "-35% 0px -60% 0px" });
+  $$("main section[id]").forEach(s => io.observe(s));
+})();
+</script>
+</body>
+</html>
