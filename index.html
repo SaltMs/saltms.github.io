@@ -123,7 +123,11 @@ kbd {
 
 /* ---------- hero ---------- */
 .hero { display: flex; flex-direction: column; gap: 28px; padding-bottom: 96px; }
-.eyebrow { margin: 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.eyebrow { display: flex; flex-direction: column; gap: 2px; font-family: var(--f-mono); font-size: 13px; line-height: 1.5; }
+.eyebrow p { margin: 0; overflow-wrap: anywhere; }
+.eyebrow .cmd { color: var(--ink); }
+.eyebrow .pr { color: var(--accent); margin-right: 4px; }
+.eyebrow .res { color: var(--muted); }
 .name {
   margin: 0; font-family: var(--f-display); font-weight: 800;
   font-size: clamp(64px, 12.5vw, 148px); line-height: .86; letter-spacing: -.045em;
@@ -216,7 +220,7 @@ section { padding-block: 0 104px; }
 .row:hover::before { background: var(--accent-soft); }
 .row.flash::before { animation: flash 1.6s ease-out; }
 @keyframes flash { 0%, 30% { background: var(--flash); } 100% { background: transparent; } }
-.row.match .when::after { content: "● joined"; display: block; margin-top: 6px; color: var(--accent); }
+.row.match .when::after { content: "● match"; display: block; margin-top: 6px; color: var(--accent); }
 :root[lang="tr"] .row.match .when::after { content: "● eşleşti"; }
 .when { font-family: var(--f-mono); font-size: 13px; color: var(--muted); line-height: 1.5; font-variant-numeric: tabular-nums; }
 .when .loc { display: block; opacity: .8; }
@@ -376,7 +380,10 @@ button.skill[aria-pressed="true"] sup { color: var(--accent-ink); }
 
   <main id="top">
     <header class="hero">
-      <p class="eyebrow"><span data-l="en">-- Istanbul, Türkiye · Management Information Systems</span><span data-l="tr">-- İstanbul, Türkiye · Yönetim Bilişim Sistemleri</span></p>
+      <div class="eyebrow">
+        <p class="cmd"><span class="pr" aria-hidden="true">murat@istanbul ~ %</span> whoami</p>
+        <p class="res"><span data-l="en">management information systems · istanbul, türkiye</span><span data-l="tr">yönetim bilişim sistemleri · istanbul, türkiye</span></p>
+      </div>
       <h1 class="name">Murat<br>Salt<span class="cursor" aria-hidden="true"></span></h1>
       <p class="lede" data-l="en">I work between business processes and the software that runs them: <em>SQL analysis</em>, <em>REST API testing</em>, accounting operations, and a Flutter game published on iOS and Android. Final-year MIS student at Kadir Has University, interested in ERP and business systems.</p>
       <p class="lede" data-l="tr">İş süreçleri ile onları çalıştıran yazılımın kesiştiği yerde çalışıyorum: <em>SQL analizi</em>, <em>REST API testleri</em>, muhasebe operasyonları ve iOS ile Android'de yayında olan bir Flutter oyunu. Kadir Has Üniversitesi Yönetim Bilişim Sistemleri son sınıf öğrencisiyim; ERP ve iş sistemleriyle ilgileniyorum.</p>
@@ -536,7 +543,7 @@ button.skill[aria-pressed="true"] sup { color: var(--accent-ink); }
     <!-- SKILLS -->
     <section id="skills" aria-labelledby="h-skills">
       <h2 class="th" id="h-skills"><span class="kw"><span data-l="en">table</span><span data-l="tr">tablo</span></span><span data-l="en">Skills</span><span data-l="tr">Yetenekler</span><span class="count">21 <span data-l="en">rows</span><span data-l="tr">satır</span></span></h2>
-      <p class="sub"><span data-l="en">Select a skill to join it against the rest of the page and see where it was used.</span><span data-l="tr">Bir yeteneği seç; sayfanın geri kalanıyla birleştirip (JOIN) nerede kullanıldığını göstereyim.</span></p>
+      <p class="sub"><span data-l="en">Select a skill to see where I used it.</span><span data-l="tr">Bir yeteneği seç, nerede kullandığımı göstereyim.</span></p>
       <div id="skill-groups"></div>
       <div class="join" id="join" aria-live="polite"></div>
     </section>
@@ -605,8 +612,8 @@ button.skill[aria-pressed="true"] sup { color: var(--accent-ink); }
       helpMeta: "Type a table name, or SELECT * FROM <table>; Rows link to the page.",
       denied: "ERROR: permission denied. This database is read-only.", deniedHint: "HINT: try SELECT instead.",
       missing: t => `ERROR: relation "${t}" does not exist`, missingHint: "HINT: run \\dt to list tables.",
-      joinIdle: "skills ⋈ work ON skill = <b>?</b> · pick a skill with a number next to it",
-      joinHead: (s, n) => `skills ⋈ work ON skill = <b>'${s}'</b> → ${n} row${n === 1 ? "" : "s"}`,
+      joinIdle: "SELECT * FROM work WHERE uses = <b>?</b><br>Pick a skill with a number next to it to see where it was used.",
+      joinHead: (s, n) => `SELECT * FROM work WHERE uses = <b>'${s}'</b> → ${n} row${n === 1 ? "" : "s"}`,
       copy: "Copy address", copied: "Copied", selected: "Selected, press ⌘C",
       conn: n => `connected · murat_salt.db · ${n} rows in 6 tables`,
       groups: ["Data & business", "Development", "Tools & methods"],
@@ -619,8 +626,8 @@ button.skill[aria-pressed="true"] sup { color: var(--accent-ink); }
       helpMeta: "Bir tablo adı yaz ya da SELECT * FROM <tablo>; Satırlar sayfadaki bölüme götürür.",
       denied: "HATA: izin reddedildi. Bu veritabanı salt okunur.", deniedHint: "İPUCU: bunun yerine SELECT dene.",
       missing: t => `HATA: "${t}" adlı tablo yok`, missingHint: "İPUCU: tabloları görmek için \\dt yaz.",
-      joinIdle: "yetenekler ⋈ isler ON yetenek = <b>?</b> · yanında sayı olan bir yeteneği seç",
-      joinHead: (s, n) => `yetenekler ⋈ isler ON yetenek = <b>'${s}'</b> → ${n} satır`,
+      joinIdle: "SELECT * FROM isler WHERE kullanilan = <b>?</b><br>Nerede kullanıldığını görmek için yanında sayı olan bir yeteneği seç.",
+      joinHead: (s, n) => `SELECT * FROM isler WHERE kullanilan = <b>'${s}'</b> → ${n} satır`,
       copy: "Adresi kopyala", copied: "Kopyalandı", selected: "Seçildi, ⌘C'ye bas",
       conn: n => `bağlı · murat_salt.db · 6 tabloda ${n} satır`,
       groups: ["Veri ve iş", "Geliştirme", "Araçlar ve yöntemler"],
